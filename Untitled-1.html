@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Math Expression Evaluator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    input, button {
+      font-size: 1.2em;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Evaluate Math Expression from String</h2>
+
+  <input type="text" id="expression" placeholder="Enter math expression, e.g., 2 + 3 * (4 - 1)" size="50">
+  <button onclick="evaluateExpression()">Evaluate</button>
+
+  <p><strong>Result:</strong> <span id="result"></span></p>
+
+  <script>
+    function isValidMathExpression(expr) {
+      expr = expr.replace(/\s+/g, ''); // Remove spaces
+
+      // Check allowed characters only
+      if (!/^[0-9+\-*/().]+$/.test(expr)) {
+        return false;
+      }
+
+      // Check for balanced parentheses
+      let balance = 0;
+      for (let char of expr) {
+        if (char === '(') balance++;
+        if (char === ')') balance--;
+        if (balance < 0) return false;
+      }
+      if (balance !== 0) return false;
+
+      // Prevent invalid sequences like ++, **, etc.
+      if (/[\/*+\-]{2,}/.test(expr)) {
+        return false;
+      }
+
+      return true;
+    }
+
+    function evaluateExpression() {
+      const input = document.getElementById('expression').value;
+      const resultElement = document.getElementById('result');
+
+      if (!isValidMathExpression(input)) {
+        resultElement.textContent = "❌ Invalid expression!";
+        resultElement.style.color = "red";
+        return;
+      }
+
+      try {
+        const result = Function('"use strict"; return (' + input + ')')();
+        resultElement.textContent = result;
+        resultElement.style.color = "green";
+      } catch (err) {
+        resultElement.textContent = "⚠️ Error evaluating expression.";
+        resultElement.style.color = "orange";
+      }
+    }
+  </script>
+</body>
+</html>
